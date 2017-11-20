@@ -1,3 +1,5 @@
+from datetime import time
+
 from functions import *
 import sys, os.path
 import pygame
@@ -90,6 +92,14 @@ class Player(object):
         self.velocity[0] += min(self.acceleration[0], self.maxVelocity)
         self.velocity[1] += min(self.acceleration[1], self.maxVelocity)
 
+    def add_force(self,force):
+        self.acceleration[0] = self.acceleration[0] + force[0]
+        self.acceleration[1] = self.acceleration[1] + force[1]
+
+        self.velocity[0] += self.acceleration[0]
+        self.velocity[1] += self.acceleration[1]
+
+
     def move(self):
         self.velocity[0] *= self.friction
         self.velocity[1] *= self.friction
@@ -118,8 +128,10 @@ class Player(object):
         self.mass -= self.mass / 2
         projectiles.append(Projectile(self.angle, int(self.mass / 1.5), self.x + (math.cos(angrad) * (self.mass * 6.2)), self.y - (math.sin(angrad) * (self.mass * 6.2))))
 
+    def dash(self):
+        self.add_force([math.cos(math.radians(self.angle)), -math.sin(math.radians(self.angle))])
+
     def set_rotation(self, sin_value, cos_value):
-        if cos_value != 0:
             if right_y_axis < 0:
                 self.angle = math.degrees(math.atan(cos_value / sin_value)) - 270
             else:
@@ -264,7 +276,10 @@ class Singularity(object):
         self.effects = []
         self.canSuck = canSuck
         self.life_time = life_time
-
+        self.heading = 0
+        self.velocity = [0, 0]
+        self.speed_x = 0
+        self.speed_y = 0
 
         # Create Effects
         for i in range(10):
@@ -284,6 +299,9 @@ class Singularity(object):
         pygame.draw.circle(surface, c, (int(self.x), int(self.y)), int(self.mass), 1)
 
     def update(self):
+
+        self.move() # changed - added
+
         # Update Effects
         remove_list = []
 
@@ -296,6 +314,21 @@ class Singularity(object):
             for i in range(len(remove_list)):
                 self.effects.remove(remove_list[i])
                 self.create_effect()
+
+    def move(self):         #changed - added
+        self.velocity[0] = self.speed_x * math.cos(math.radians(self.heading))
+        self.velocity[1] = -1 * self.speed_y * math.sin(math.radians(self.heading))
+        self.x += self.velocity[0]
+        self.y += self.velocity[1]
+
+        if self.x + self.mass > screen_width:
+            self.bounce("right")
+        if self.x - self.mass < 0:
+            self.bounce("left")
+        if self.y + self.mass > screen_height:
+            self.bounce("bot")
+        if self.y - self.mass < 0:
+            self.bounce("top")
 
     def create_effect(self):
         if self.canSuck:
@@ -312,6 +345,16 @@ class Singularity(object):
             angle = (angle + 36) % 360
             burst_particles.append(BurstParticle(self.x, self.y, angle))
 
+    def start_movement(self): #changed - added
+        self.heading = random.random() * 360
+        self.speed_x = 0.25 * (1 + (70 - self.mass * 2) / 70)
+        self.speed_y = 0.25 * (1 + (70 - self.mass * 2) / 70)
+
+    def bounce(self, wall): #changed - added
+        if wall == "top" or wall == "bot":
+            self.speed_y *= -1
+        elif wall == "right" or wall == "left":
+            self.speed_x *= -1
 
 class SingularityEffect(object):
     def __init__(self, x, y, color, radius, opacity, type):
@@ -333,7 +376,6 @@ class SingularityEffect(object):
 
         # Update Opacity
         self.opacity -= random.randint(2, 6)
-
 
 class DeathParticle(object):
     def __init__(self, x, y, angle):
@@ -472,9 +514,9 @@ def reset():
 
 # Scene Initialization
 pygame.init()
-screen_width = 1600
-screen_height = 900
-flags = pygame.FULLSCREEN | pygame.DOUBLEBUF
+screen_width = 1280
+screen_height = 720
+flags = pygame.DOUBLEBUF
 screen = pygame.display.set_mode((screen_width, screen_height), flags, 32)
 pygame.display.set_caption("Singularity")
 pygame.display.set_icon(icon)
@@ -485,10 +527,10 @@ score_s = pygame.mixer.Sound('score.wav', )
 shoot_s = pygame.mixer.Sound('shoot.wav')
 music_s = pygame.mixer.music.load('music.wav')
 suck_s = pygame.mixer.Sound('suck.wav')
-count_1_s.set_volume(0.95)
-explosion_s.set_volume(0.25)
-score_s.set_volume(1)
-shoot_s.set_volume(0.25)
+count_1_s.set_volume(0.0)
+explosion_s.set_volume(0.0)
+score_s.set_volume(0)
+shoot_s.set_volume(0.0)
 
 
 # Variable Initialization
@@ -510,9 +552,11 @@ in_play = True
 menu = True
 game = False
 p1_ready = False
-p2_ready = False
+p2_ready = True
 p1_a = False
 p2_a = False
+p1_dash = False
+p2_dash = False
 has_won = 'None'
 
 # Scene Asset Initialization
@@ -534,7 +578,9 @@ score_counter = counter_font.render(str(player1_score) + ' : ' + str(player2_sco
 
 # Object Initialization
 world = World(screen_width, screen_height)
-singularities.append(Singularity(100, screen_width / 2, screen_height / 2, False, -1))
+main_singularity = Singularity(100, screen_width / 2, screen_height / 2, False, -1)
+singularities.append(main_singularity)
+
 for i in range(4):
     border_effect.append(BorderEffect(35 * i))
 player1 = Player(160, screen_height / 2, 25, 1)
@@ -542,11 +588,15 @@ player2 = Player(screen_width - 160, screen_height / 2, 25, 2)
 player2.angle = 180
 # Menu Loop
 pygame.mixer.music.play(-1)
-pygame.mixer.music.set_volume(0.20)
+pygame.mixer.music.set_volume(0.0)
 
 p1_lastshot = 0
 p2_lastshot = 0
+p1_lastdash = 0
+p2_lastdash = 0
 reload = 0.3
+reload_dash = 0.3
+
 
 while in_game:
     clock.tick(fps)
@@ -668,12 +718,14 @@ while in_game:
         tick += 1
         pygame.display.update()
 
+    #main_singularity.start_movement() #changed - added
     # Game Loop
     while game:
         # Start Block
         time_elapsed = clock.tick()
         timer += time_elapsed
         screen.fill((0, 0, 0))
+
 
         # Control Block
         pygame.event.pump()
@@ -695,8 +747,19 @@ while in_game:
                     if p2_a and time.time() > p2_lastshot:
                         player2.launch_projectile()
                         p2_lastshot = time.time() + reload
+
+                    #dash
+                    if p1_dash and time.time() > p1_lastdash:
+                        player1.dash()
+                        p1_lastdash = time.time() + reload_dash
+                    if p2_dash and time.time() > p2_lastdash:
+                        player2.dash()
+                        p2_lastdash = time.time() + reload_dash
+
                     p1_a = False
                     p2_a = False
+                    p1_dash = False
+                    p2_dash = False
 
         for i in range(pygame.joystick.get_count()):
                 joystick = pygame.joystick.Joystick(i)
@@ -708,7 +771,7 @@ while in_game:
                 right_y_axis = joystick.get_axis(3)
 
                 if i == 0:
-                    if abs(left_x_axis) > 0.25 and abs(left_y_axis) > 0.25:
+                    if abs(left_x_axis) > 0.25 and abs(left_y_axis) > 0.25: #AND? Or OR?
                         player1.set_force([left_x_axis, left_y_axis])
                     elif abs(left_x_axis) > 0.25:
                         player1.set_force([left_x_axis, 0])
@@ -717,8 +780,13 @@ while in_game:
                     else:
                         player1.set_force([0, 0])
 
-                    if abs(right_y_axis) > 0.15 and abs(right_x_axis) > 0.15:
+                    if abs(right_y_axis) > 0.25 or abs(right_x_axis) > 0.25: #changed IMPORTANT
                         player1.set_rotation(right_y_axis, right_x_axis)
+
+                    #add something that avoid bounces....a first value (little) and after being detected change the
+                    # detection limit to a bigger one until the joystic returns to a small value
+                    # this is going to avoid false positives
+
                 if i == 1:
                     if abs(left_x_axis) > 0.25 and abs(left_y_axis) > 0.25:
                         player2.set_force([left_x_axis, left_y_axis])
@@ -729,17 +797,26 @@ while in_game:
                     else:
                         player2.set_force([0, 0])
 
-                    if abs(right_y_axis) > 0.15 and abs(right_x_axis) > 0.15:
+                    if abs(right_y_axis) > 0.10 and abs(right_x_axis) > 0.10:
                         player2.set_rotation(right_y_axis, right_x_axis)
 
                 buttons = joystick.get_numbuttons()
                 for j in range(buttons):
                     button = joystick.get_button(j)
-                    if button == 1 and j == 5:
-                        if i == 0:
-                            p1_a = True
-                        if i == 1:
-                            p2_a = True
+                    if button == 1:
+                        print(j)
+
+                    if button == 1:
+                        if j == 5:
+                            if i == 0:
+                                p1_a = True
+                            if i == 1:
+                                p2_a = True
+                        if j == 4:
+                            if i == 0:
+                                p1_dash = True;
+                            if i == 1:
+                                p2_dash = True;
 
         # World Effect Counter
         if tick == 4:
@@ -782,14 +859,41 @@ while in_game:
             player2.mass = 20
 
         # Generating singularities
-        if timer >= 3000:
+        if timer >= 250:
             if in_play:
+                #added - generation mini singularities outside big singularity / working for big singularity in movement
+                if random.randrange(1, 3) == 1:
+                    max_generation_position = int(main_singularity.x - main_singularity.mass)
+                    if max_generation_position > 0:
+                        x_for_sing = random.randrange(0, max_generation_position)
+                    else:
+                        x_for_sing = screen_width * 9 / 10
+                else:
+                    min_generation_position = int(main_singularity.x + main_singularity.mass)
+                    if min_generation_position < screen_width:
+                        x_for_sing = random.randrange(min_generation_position, screen_width)
+                    else:
+                        x_for_sing = screen_width - screen_width*9/10
+
+                if random.randrange(1, 3) == 1:
+                    max_generation_position = int(main_singularity.y - main_singularity.mass)
+                    if max_generation_position > 0:
+                        y_for_sing = random.randrange(0, max_generation_position)
+                    else:
+                        y_for_sing = screen_height * 9 / 10
+                else:
+                    min_generation_position = int(main_singularity.y + main_singularity.mass)
+                    if min_generation_position < screen_height:
+                        y_for_sing = random.randrange(min_generation_position, screen_height)
+                    else:
+                        y_for_sing = screen_height - screen_height * 9 / 10
+
+
                 singularities.append(Singularity(random.randint(30, 60),
-                                                 random.randint(int(round(screen_width / 10)),
-                                                                int(round(screen_width / 10 * 9))),
-                                                 random.randint(int(round(screen_height / 10)),
-                                                                int(round(screen_height / 10 * 9))),
+                                                 x_for_sing,
+                                                 y_for_sing,
                                                  True, random.randint(2000, 4000)))
+            #end modification
             timer = 0
 
         # Update Block
@@ -847,10 +951,12 @@ while in_game:
             x = player1.x - arrow.get_rect().size[0] / 2 + (math.cos(math.radians(player1.angle)) * (player1.mass * 2))
             y = player1.y - arrow.get_rect().size[1] / 2 - (math.sin(math.radians(player1.angle)) * (player1.mass * 2))
             screen.blit(pygame.transform.rotate(arrow, player1.angle), (x, y))
+            print (player1.angle)
         if player2.show:
             x = player2.x - arrow.get_rect().size[0] / 2 + (math.cos(math.radians(player2.angle)) * (player2.mass * 2))
             y = player2.y - arrow.get_rect().size[1] / 2 - (math.sin(math.radians(player2.angle)) * (player2.mass * 2))
             screen.blit(pygame.transform.rotate(arrow, player2.angle), (x, y))
+
         screen.blit(player1_mass, (215, 12))
         screen.blit(player2_mass, (screen_width - 365, 12))
         screen.blit(score_counter, (screen_width/2 - 132, 12))
