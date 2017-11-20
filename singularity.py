@@ -8,7 +8,7 @@ import random
 import time
 import pygame.mixer
 
-# Initialize Project
+# Initialize P roject
 if sys.platform in ["win32", "win64"]:
     os.environ["SDL_VIDEO_CENTERED"] = "1"
 icon = pygame.image.load('singularity.png')
