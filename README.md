@@ -1,6 +1,6 @@
 # Singularity-Pygame
 
-Game Jam Title - 48 hours to Completion
+Game Jam Title - 48 hours to Completion (Shawnee State University GDOS GameJam)
 
 https://youtu.be/vtN9hDAGOEE
 
