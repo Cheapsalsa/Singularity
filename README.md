@@ -1,4 +1,4 @@
-# Singularity-Python
+# Singularity-Pygame
 
 Game Jam Title - 48 hours to Completion
 
