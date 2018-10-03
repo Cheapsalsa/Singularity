@@ -1,4 +1,4 @@
-# Game Jam Title - 48 hours to Completion (Shawnee State University GDOS GameJam)
+# Singularity - 48-Hour Game Jam Title
 
 DISCLAIMER: This is 48-Hour Game Jam style code. It is messy and clunked together in order to meet the two day deadline.
 
@@ -6,4 +6,4 @@ DISCLAIMER: This is 48-Hour Game Jam style code. It is messy and clunked togethe
 
 https://youtu.be/vtN9hDAGOEE
 
-Special thanks to Carlos Hernandez for his work with me during the Game Jam.
+Special thanks to Carlos Hernandez for his work with me during the Game Jam. (Shawnee State University GDOS GameJam)
