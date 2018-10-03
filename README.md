@@ -7,3 +7,7 @@ DISCLAIMER: This is 48-Hour Game Jam style code. It is messy and clunked togethe
 https://youtu.be/vtN9hDAGOEE
 
 Special thanks to Carlos Hernandez for his work with me during the Game Jam. (Shawnee State University GDOS GameJam)
+
+
+Requires Pygame to run "cmd pip install Pygame"
+- Note: has currently been left in a development state in favor of the Unity5 reboot "Beyond Critical".
