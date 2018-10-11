@@ -3,6 +3,7 @@
 DISCLAIMER: This is 48-Hour Game Jam style code. It is messy and clunked together in order to meet the two day deadline.
 
 4-player co-op versus game featuring a space theme and a KOTH gamemode. Made with Python and PyGame
+- Completed in less than 48 hours
 - Supports up to 4 controllers
 - Fast co-op versus gameplay
 - Simulated particles and physics
