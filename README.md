@@ -4,7 +4,7 @@ DISCLAIMER: This is 48-Hour Game Jam style code. It is messy and clunked togethe
 
 4-player co-op versus game featuring a space theme and a KOTH gamemode. Made with Python and PyGame
 
-![alt text](https://raw.githubusercontent.com/Cheapsalsa/Singularity/master/GitContent/Image_menu.PNG)
+![alt text](https://raw.githubusercontent.com/DaltonFox/Singularity/master/GitContent/Image_menu.png)
 
 https://youtu.be/vtN9hDAGOEE
 
