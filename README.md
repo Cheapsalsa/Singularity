@@ -12,7 +12,7 @@ DISCLAIMER: This is 48-Hour Game Jam style code. It is messy and clunked togethe
 [YouTube Gameplay Demo](https://youtu.be/vtN9hDAGOEE)
 
 # Screenshot Content
-![alt text](https://raw.githubusercontent.com/DaltonFox/Singularity/master/GitContent/Image_menu.png)
+![alt text](https://raw.githubusercontent.com/DaltonFox/Singularity/master/GitContent/Image_singular.gif)
 
 Requires Pygame to run "cmd pip install Pygame" + Xbox 360 Controllers
 - Note: has currently been left in a development state in favor of the Unity5 reboot "Beyond Critical".
