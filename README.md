@@ -17,6 +17,6 @@ __Technologies learned include:__ Python, Pygame, Gamepad, Gimp 2.8, Audacity, V
 ![alt text](https://raw.githubusercontent.com/DaltonFox/Singularity/master/GitContent/Image_singular.gif)
 
 *Requires Pygame to run "cmd pip install Pygame" + Xbox 360 Controllers*
-- Note: development has been dropped in favor of the Unity5 reboot "Beyond Critical".
+- Note: development has been dropped in favor of the Unity5 reboot ["Beyond Critical"](https://github.com/DaltonFox/Beyond-Critical).
 
 Special thanks to Carlos Hernandez for his work with me during the Game Jam. (Shawnee State University GDOS GameJam 2017)
