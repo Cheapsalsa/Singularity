@@ -1,8 +1,8 @@
-# Singularity - 48-Hour Game Jam Title
+# Singularity 
+- This game was made in under 48 hours.
+- Development has been dropped in favor of the Unity5 reboot ["Beyond Critical"](https://playcritical.com).
 
-*DISCLAIMER: This is 48-Hour Game Jam style code. It is messy and clunked together in order to meet the deadline.*
-
-### 4-player co-op versus game featuring a space theme and a KOTH gamemode. 
+### 4-player co-op versus game featuring a space theme and a king of the hill gamemode. 
 __Technologies learned include:__ Python, Pygame, Gamepad, Gimp 2.8, Audacity, Visual Studio Code
 
 - Completed in less than 48 hours
@@ -17,6 +17,4 @@ __Technologies learned include:__ Python, Pygame, Gamepad, Gimp 2.8, Audacity, V
 ![alt text](https://raw.githubusercontent.com/DaltonFox/Singularity/master/GitContent/Image_singular.gif)
 
 *Requires Pygame to run "cmd pip install Pygame" + Xbox 360 Controllers*
-- Note: development has been dropped in favor of the Unity5 reboot ["Beyond Critical"](https://playcritical.com).
-
-Special thanks to Carlos Hernandez for his work with me during the Game Jam. (Shawnee State University GDOS GameJam 2017)
+Special thanks to Carlos Hernandez for his work with me during the Game Jam. Shawnee State University 2017
